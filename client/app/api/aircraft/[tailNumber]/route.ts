@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { tailNumber: string } }
+  context: { params: Promise<Record<string, string>> }
 ) {
   try {
-    const { tailNumber } = context.params;
+    const { tailNumber } = await context.params; 
     await connect();
 
     const aircraft = await Aircraft.findOne({ tailNumber }).lean();
@@ -26,10 +26,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { tailNumber: string } }
+  context: { params: Promise<Record<string, string>> }
 ) {
   try {
-    const { tailNumber } = context.params;
+    const { tailNumber } = await context.params; 
     await connect();
 
     const body = await request.json();
@@ -54,10 +54,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { tailNumber: string } }
+  context: { params: Promise<Record<string, string>> }
 ) {
   try {
-    const { tailNumber } = context.params;
+    const { tailNumber } = await context.params; 
     await connect();
 
     const deleted = await Aircraft.findOneAndDelete({ tailNumber });

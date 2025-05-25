@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
+import dynamic from "next/dynamic";
+
+const MapComponent = dynamic(() => import("@/components/MapComponent"), { ssr: false });
 
 interface Location {
   lat: number;
@@ -79,12 +79,6 @@ const AircraftManager = () => {
     setSelectedTailNumber(null);
   };
 
-  const icon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-    iconSize: [25, 25],
-    iconAnchor: [12, 25],
-  });
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">{isUpdating ? "Update Aircraft" : "Add Aircraft"}</h1>
@@ -119,7 +113,9 @@ const AircraftManager = () => {
             type="number"
             placeholder="Latitude"
             value={formData.location.lat}
-            onChange={(e) => setFormData({ ...formData, location: { ...formData.location, lat: parseFloat(e.target.value) } })}
+            onChange={(e) =>
+              setFormData({ ...formData, location: { ...formData.location, lat: parseFloat(e.target.value) } })
+            }
             className="block w-full p-2 border rounded"
             required
           />
@@ -127,7 +123,9 @@ const AircraftManager = () => {
             type="number"
             placeholder="Longitude"
             value={formData.location.lng}
-            onChange={(e) => setFormData({ ...formData, location: { ...formData.location, lng: parseFloat(e.target.value) } })}
+            onChange={(e) =>
+              setFormData({ ...formData, location: { ...formData.location, lng: parseFloat(e.target.value) } })
+            }
             className="block w-full p-2 border rounded"
             required
           />
@@ -148,28 +146,7 @@ const AircraftManager = () => {
 
       <h2 className="text-xl font-semibold mb-4">Aircraft Map</h2>
       <div className="w-full h-[500px] mb-10">
-        <MapContainer center={[20, 0]} zoom={2} className="w-full h-full z-0">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-          {aircrafts.map((aircraft) => (
-            <Marker
-              key={aircraft.tailNumber}
-              position={[aircraft.location.lat, aircraft.location.lng]}
-              icon={icon}
-              eventHandlers={{ click: () => handleEdit(aircraft) }}
-            >
-              <Popup>
-                <div className="text-sm">
-                  <strong>{aircraft.tailNumber}</strong><br />
-                  Model: {aircraft.model}<br />
-                  Status: {aircraft.status}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <MapComponent aircrafts={aircrafts} onEdit={handleEdit} />
       </div>
 
       <h2 className="text-xl font-semibold mb-2">Aircraft List</h2>
