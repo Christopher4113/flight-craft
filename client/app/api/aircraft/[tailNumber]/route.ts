@@ -4,13 +4,14 @@ import Aircraft from "@/models/flightModels";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _request: NextRequest,
-  { params }: { params: { tailNumber: string } }
+  request: NextRequest,
+  context: { params: { tailNumber: string } }
 ) {
   try {
+    const { tailNumber } = context.params;
     await connect();
 
-    const aircraft = await Aircraft.findOne({ tailNumber: params.tailNumber }).lean();
+    const aircraft = await Aircraft.findOne({ tailNumber }).lean();
 
     if (!aircraft) {
       return NextResponse.json({ error: "Aircraft not found" }, { status: 404 });
@@ -25,16 +26,17 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { tailNumber: string } }
+  context: { params: { tailNumber: string } }
 ) {
   try {
+    const { tailNumber } = context.params;
     await connect();
 
     const body = await request.json();
     const { status, model, location } = body;
 
     const updatedAircraft = await Aircraft.findOneAndUpdate(
-      { tailNumber: params.tailNumber },
+      { tailNumber },
       { $set: { ...(status && { status }), ...(model && { model }), ...(location && { location }) } },
       { new: true }
     );
@@ -51,13 +53,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: { tailNumber: string } }
+  request: NextRequest,
+  context: { params: { tailNumber: string } }
 ) {
   try {
+    const { tailNumber } = context.params;
     await connect();
 
-    const deleted = await Aircraft.findOneAndDelete({ tailNumber: params.tailNumber });
+    const deleted = await Aircraft.findOneAndDelete({ tailNumber });
 
     if (!deleted) {
       return NextResponse.json({ error: "Aircraft not found" }, { status: 404 });
